@@ -48,10 +48,7 @@ router.post('/item', function(req, res){
 
 });
 
-router.get('/item', (req, res) => {
-	res.send("Hello world!")
-})
-
+/* ===== IAN ===== */
 // Get an item
 router.get('/item/:collectionName?/:itemName', (req, res) => {
   res.send("Get item")
@@ -81,6 +78,8 @@ router.get('/item/:collectionName?/:itemName/use', (req, res) => {
 router.get('/item/:collectionName?/:itemName/refresh', (req, res) => {
   res.send("Refresh item")
 })
+
+/* ===== REMINGTON ===== */
 
 // See if item is in collection
 router.get('/item/:collectionName?/:itemName/exists', (req, res) => {
