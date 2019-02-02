@@ -23,7 +23,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
 app.get('/', function(req, res) {
-  res.send("hello");
+  res.send("The API is working!");
 });
 
 /* ======  ITEM ROUTES ====== */
@@ -60,12 +60,12 @@ router.put('/item', (req, res) => {
 })
 
 // Delete an item
-router.delete('/item/:collectionName?/:itemName', (req, res) => {
+router.delete('/item/:collectionName/:itemName', (req, res) => {
   res.send("Delete item")
 })
 
 // Get a random item
-router.get('/item/random', function(req, res) {
+router.get('/item/:collectionName/random', function(req, res) {
   res.send("Get random item")
 });
 
