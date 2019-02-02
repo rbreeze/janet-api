@@ -17,6 +17,7 @@ app.get('/', function(req, res) {
 });
 
 app.post('/api/addItem', function(req, res){
+
 	let newItem = new itemModel({
 		name: req.body.name,
 		value: req.body.value,
@@ -54,10 +55,9 @@ app.get('/api/getCollections', function(req, res){
 	}
 });
 
-app.get('/api/collections', function(req, res){
-	let query = itemCollection.findById({userId : req.body.userId});
-	let promise = query.exec();
-	promise.addBack(function (err, docs) {});
+app.get('/api/getRandomItem', function(req, res)
+{
+	
 });
 
 // Run the app on port 3000. 
