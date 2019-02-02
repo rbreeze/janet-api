@@ -29,7 +29,7 @@ app.get('/', function(req, res) {
 /* ======  ITEM ROUTES ====== */
 
 // Create an item
-router.post('/item', function(req, res){
+router.post('/item', (req, res) => {
 
   let newItem = new itemModel(req.body);
   newItem.save();
@@ -71,12 +71,62 @@ router.get('/item/:collectionName/random', function(req, res) {
 
 // Use an item
 router.get('/item/:collectionName?/:itemName/use', (req, res) => {
-  res.send("Use item")
+
+  let query = itemCollectionModel.findOne({ name:req.params.collectionName});
+  query.exec((err, collection) => {
+
+    let query2 = collection.items.findOne({name: req.params.itemName});
+    query2.exec((err, item) => {
+
+      let query3 = itemModel.findOne({_id : item._id});
+      query.exec((err, singleItem) => {
+
+        singleItem.used = true;
+        singleItem.save(function (err) {
+          if (err) return handleError(err);
+        });
+
+      });
+      item.save(function (err) {
+        if (err) return handleError(err);
+      });
+
+    });
+    collection.save(function (err) {
+      if (err) return handleError(err);
+    });
+
+  });
+
 })
 
 // Refresh an item
 router.get('/item/:collectionName?/:itemName/refresh', (req, res) => {
-  res.send("Refresh item")
+  let query = itemCollectionModel.findOne({ name:req.params.collectionName});
+  query.exec((err, collection) => {
+    
+    let query2 = collection.items.findOne({name: req.params.itemName});
+    query2.exec((err, item) => {
+
+      let query3 = itemModel.findOne({_id : item._id});
+      query.exec((err, singleItem) => {
+
+        singleItem.used = false;
+        singleItem.save(function (err) {
+          if (err) return handleError(err);
+        });
+
+      });
+      item.save(function (err) {
+        if (err) return handleError(err);
+      });
+
+    });
+    collection.save(function (err) {
+      if (err) return handleError(err);
+    });
+
+  });
 })
 
 // See if item is in collection
