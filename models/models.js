@@ -5,7 +5,8 @@ let itemSchema = new mongoose.Schema({
 	value: String,
 	alias: [String],
 	used: {type: Boolean, default: false},
-	userId: String
+	userId: String, 
+  collectionName: String
 });
 
 let itemCollectionSchema = new mongoose.Schema({

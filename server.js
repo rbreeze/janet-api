@@ -51,7 +51,7 @@ router.post('/item', function(req, res){
 /* ===== IAN ===== */
 // Get an item
 router.get('/item/:collectionName?/:itemName', (req, res) => {
-  res.send("Get item")
+  res.send(req.params.collectionName)
 })
 
 // Update an item
@@ -79,30 +79,33 @@ router.get('/item/:collectionName?/:itemName/refresh', (req, res) => {
   res.send("Refresh item")
 })
 
-/* ===== REMINGTON ===== */
-
 // See if item is in collection
-router.get('/item/:collectionName?/:itemName/exists', (req, res) => {
-  res.send("Check if item exists")
+router.get('/item/:collectionName?/:itemName/exists', async (req, res) => {
+	var collectionName = req.params.collectionName
+	let collection = await itemCollectionModel.findOne({ name: collectionName })
+	if (!collection) collectionName = "default"
+
+	let item = await itemModel.findOne({ name: req.params.itemName, collectionName: collectionName })
+	return !!(item)
 })
+
+// aliases = [ { name : "foo" }, { name: "bar" }]
+// itemModel.find({ $or : aliases })
 
 /* ======  COLLECTION ROUTES ====== */
 
 // Create a collection
 router.post('/collection', function(req, res){
-  let newItemCollection =  new itemCollectionModel(
-  {
-    name: req.body.name,
-    userId: req.body.userId
+  let newItemCollection =  new itemCollectionModel(req.body);
+  newItemCollection.save((err, data) => {
+  	if (err) res.send(err)
+  	else res.send(data)
   });
-
-  newItemCollection.save();
-
 });
 
 // Get all collections
 router.get('/collections', function(req, res){
-  let query = itemCollectionModel.find({userId: req.body.userId});
+  let query = itemCollectionModel.find();
   query.exec((err, collections) => {
     res.send(collections);
   })
@@ -110,12 +113,18 @@ router.get('/collections', function(req, res){
 
 // Update a collection
 router.put('/collection', (req, res) => {
-  res.send("Update collection")
+  itemCollectionModel.findOneAndUpdate({ _id: req.body._id }, req.body, (err, data) => {
+  	if (err) res.send(err)
+  	else res.send(data)
+  })
 })
 
 // Delete a collection
 router.delete('/collection/:name', (req, res) => {
-  res.send("Delete collection")
+  itemCollectionModel.remove({ name: req.params.name }, (err, data) => {
+  	if (err) res.send(err)
+  	else res.send(data)
+  })
 })
 
 /* ======  START THE SERVER ====== */
