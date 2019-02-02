@@ -15,7 +15,7 @@ mongoose.connect(MONGO_URL, { useNewUrlParser: true })
 });
 
 const app =  express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 7000;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -155,7 +155,7 @@ app.use('/api', router)
 
 // Run the app on port 3000. 
 app.listen(PORT, function(){
-	console.log('Server is running on port 3000')
+	console.log('Server is running on port 7000')
 });
 
 
