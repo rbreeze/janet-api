@@ -1,7 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const models = require(__dirname + '/models/models.js');
+const itemModel = require('./models/Item');
+const itemCollectionModel = require('./models/Collection');
 const router = express.Router()
 
 // connect to mongoDB database
@@ -13,9 +14,6 @@ mongoose.connect(MONGO_URL, { useNewUrlParser: true })
   console.log(err) 
 });
 
-itemModel = models.item;
-itemCollectionModel = models.itemCollection;
-
 const app =  express();
 const PORT = process.env.PORT || 3000;
 
@@ -26,37 +24,52 @@ app.get('/', function(req, res) {
   res.send("The API is working!");
 });
 
+let getPrimaryCollectionName = async function(collectionName) {
+	let collection = await itemCollectionModel.findOne({ $or: [ { name: collectionName }, { aliases: collectionName } ]})
+	if (!collection) collectionName = "default"
+	else collectionName = collection.name
+
+	return collectionName
+}
+
+let getPrimaryItemName = async function(itemName) {
+	let item = await itemModel.findOne({ $or: [ { name: itemName }, { aliases: itemName } ]})
+	if (!item) itemName = "DNE"
+	else itemName = item.name
+
+	return itemName
+}
+
 /* ======  ITEM ROUTES ====== */
 
 // Create an item
-router.post('/item', (req, res) => {
+router.post('/:collection/item', async (req, res) => {
 
-  let newItem = new itemModel(req.body);
-  newItem.save();
+  let collectionName = await getPrimaryCollectionName(req.params.collection)
 
-  let collection = req.body.collection;
-  let query = itemCollectionModel.findOne({ name: req.body.collection, userId: req.body.userId});
+  itemCollectionModel.findOneAndUpdate({ name: collectionName }, { name: collectionName },
+  	{ upsert: true, new: true },
+  	(err, result) => {
 
-  query.exec((err, collection) => {
-
-    collection.items.push(newItem._id);
-    collection.save(function (err) {
-      if (err) return handleError(err);
-    });
-
+  	if (err) res.send(err)
+  	else if (!result) res.send("No collection with that name exists")
+  	else {
+  		let newItem = new itemModel(req.body)
+  		newItem.collectionName = collectionName
+  		newItem.save(function (err, data) {
+	      if (err) res.send(err);
+	      else res.send(data)
+	    });
+  	}
   });
 
 });
 
-/* ===== IAN ===== */
 // Get an item
-router.get('/item/:collectionName?/:itemName', (req, res) => {
-  res.send(req.params.collectionName)
-})
-
-// Update an item
-router.put('/item', (req, res) => {
-  res.send("Update item")
+router.get('/item/:collectionName?/:itemName', async (req, res) => {
+  let item = await itemModel.findOne({ name: req.params.itemName, collectionName: req.params.collectionName })
+  if (!item) res.send("That item doesn't exist")
+  else res.send(item)
 })
 
 // Delete an item
@@ -66,67 +79,43 @@ router.delete('/item/:collectionName/:itemName', (req, res) => {
 
 // Get a random item
 router.get('/item/:collectionName/random', function(req, res) {
-  res.send("Get random item")
+  let collectionName = getPrimaryCollectionName(req.params.collectionName)
+  res.send("random")
 });
 
 // Use an item
-router.get('/item/:collectionName?/:itemName/use', (req, res) => {
+router.get('/item/:collectionName?/:itemName/use', async (req, res) => {
 
-  let query = itemCollectionModel.findOne({ name:req.params.collectionName});
-  query.exec((err, collection) => {
+	let collectionName = await getPrimaryCollectionName(req.params.collectionName)
 
-    let query2 = collection.items.findOne({name: req.params.itemName});
-    query2.exec((err, item) => {
+	let item = await itemModel.findOne({ name: req.params.itemName, collectionName: collectionName })
 
-      let query3 = itemModel.findOne({_id : item._id});
-      query.exec((err, singleItem) => {
-
-        singleItem.used = true;
-        singleItem.save(function (err) {
-          if (err) return handleError(err);
-        });
-
-      });
-      item.save(function (err) {
-        if (err) return handleError(err);
-      });
-
-    });
-    collection.save(function (err) {
-      if (err) return handleError(err);
-    });
-
-  });
+	if (!item) res.send("Item does not exist")
+	else {
+		item.used = true
+		item.save((err, data) => {
+			if (err) res.send(err)
+			else res.send(data)
+		})
+	}
 
 })
 
 // Refresh an item
-router.get('/item/:collectionName?/:itemName/refresh', (req, res) => {
-  let query = itemCollectionModel.findOne({ name:req.params.collectionName});
-  query.exec((err, collection) => {
-    
-    let query2 = collection.items.findOne({name: req.params.itemName});
-    query2.exec((err, item) => {
+router.get('/item/:collectionName?/:itemName/refresh', async (req, res) => {
 
-      let query3 = itemModel.findOne({_id : item._id});
-      query.exec((err, singleItem) => {
+	let collectionName = await getPrimaryCollectionName(req.params.collectionName)
 
-        singleItem.used = false;
-        singleItem.save(function (err) {
-          if (err) return handleError(err);
-        });
+	let item = await itemModel.findOne({ name: req.params.itemName, collectionName: collectionName })
 
-      });
-      item.save(function (err) {
-        if (err) return handleError(err);
-      });
-
-    });
-    collection.save(function (err) {
-      if (err) return handleError(err);
-    });
-
-  });
+	if (!item) res.send("Item does not exist")
+	else {
+		item.used = false
+		item.save((err, data) => {
+			if (err) res.send(err)
+			else res.send(data)
+		})
+	}
 })
 
 // See if item is in collection
@@ -136,11 +125,9 @@ router.get('/item/:collectionName?/:itemName/exists', async (req, res) => {
 	if (!collection) collectionName = "default"
 
 	let item = await itemModel.findOne({ name: req.params.itemName, collectionName: collectionName })
-	return !!(item)
+	res.send(!!(item))
 })
 
-// aliases = [ { name : "foo" }, { name: "bar" }]
-// itemModel.find({ $or : aliases })
 
 /* ======  COLLECTION ROUTES ====== */
 
