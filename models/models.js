@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 let itemSchema = new mongoose.Schema({
 	name: String,
 	value: String,
-	alias: [String]
+	alias: [String],
+	used: {type: Boolean, default: false}
 });
 
 let itemCollectionSchema = new mongoose.Schema({
@@ -12,4 +13,5 @@ let itemCollectionSchema = new mongoose.Schema({
 	alias: [String]
 })
 
-models.export = mongoose.model('Item', )
+let Item = module.exports = mongoose.model('Item', itemSchema);
+let itemCollection = module.exports = mongoose.model('itemCollection', itemCollectionSchema);
