@@ -26,7 +26,7 @@ app.post('/api/addItem', function(req, res){
 	});
 	newItem.save();
 	let collection = req.body.collection;
-	var query = itemCollectionModel.findOne({ name: req.body.collection, userId: req.body.userId});
+	let query = itemCollectionModel.findOne({ name: req.body.collection, userId: req.body.userId});
 	query.exec(function (err, collection) {
 		collection.items.push(newItem._id);
 		collection.save(function (err) {
@@ -35,6 +35,24 @@ app.post('/api/addItem', function(req, res){
 	};
 });
 
+app.post('/api/addCollection', function(req, res){
+	let newItemCollection =  new itemCollectionModel(
+	{
+		name: req.body.name,
+		userId: req.body.userId
+	});
+
+	newItemCollection.save();
+
+});
+
+app.get('/api/getCollections', function(req, res){
+	let query = itemCollectionModel.find({userId: req.body.userId});
+	query.exec(function(err, collections))
+	{
+		res.send(collections);
+	}
+});
 
 app.get('/api/collections', function(req, res){
 	let query = itemCollection.findById({userId : req.body.userId});
