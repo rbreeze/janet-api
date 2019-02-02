@@ -4,6 +4,15 @@ const bodyParser = require('body-parser');
 const models = require(__dirname + '/models/models.js');
 const router = express.Router()
 
+// connect to mongoDB database
+const MONGO_URL = "mongodb://localhost/hackathon"
+
+mongoose.connect(MONGO_URL, { useNewUrlParser: true })
+.catch((err) => { 
+  console.log("Error connecting to database:")
+  console.log(err) 
+});
+
 itemModel = models.item;
 itemCollectionModel = models.itemCollection;
 
