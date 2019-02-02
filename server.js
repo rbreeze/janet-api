@@ -1,6 +1,6 @@
 const express = require('express');
 
-let models = require(__dirname + 'models/models.js');
+let models = require(__dirname + '/models/models.js');
 const app =  express();
 const PORT = process.env.PORT || 3000;
 
