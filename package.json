@@ -1,0 +1,14 @@
+{
+  "name": "janet",
+  "version": "1.0.0",
+  "description": "Javascript Application for iNterfacing EveryThing",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Remington Breeze, Ian McDonald, Max Michelon",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
