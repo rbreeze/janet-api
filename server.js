@@ -52,13 +52,15 @@ router.post('/:collection/item', async (req, res) => {
   	(err, result) => {
 
   	if (err) res.send(err)
-  	else if (!result) res.send("No collection with that name exists")
+  	else if (!result) res.send({ error: "No collection with that name exists" })
   	else {
   		itemModel.findOneAndUpdate({ name: req.body.name }, req.body, { upsert: true, new: true }, (err, data) => {
   			if (!req.body.collectionName)
 	  			data.collectionName = collectionName
 
 	  		data.collectionName = collectionName
+	  		if (!req.body.value)
+	  			data.value = 1
 
 	  		data.save(function (err, data) {
 		      if (err) res.send(err);
@@ -76,7 +78,7 @@ router.get('/item/:collectionName?/:itemName', async (req, res) => {
 	let collectionName = await getPrimaryCollectionName(req.params.collectionName)
 	let itemName = await getPrimaryItemName(req.params.itemName)
   let item = await itemModel.findOne({ name: itemName, collectionName: collectionName })
-  if (!item) res.send("That item doesn't exist")
+  if (!item) res.send({ error: "That item doesn't exist" })
   else res.send(item)
 })
 
@@ -87,7 +89,7 @@ router.delete('/item/:collectionName/:itemName', async (req, res) => {
 
   itemModel.remove({ name: itemName, collectionName: collectionName }, (err, data) => {
   	if (err) res.send(err)
-  	else res.send("Successfully deleted")
+  	else res.send({ message: "Successfully deleted" })
   })
 })
 
