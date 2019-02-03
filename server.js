@@ -109,6 +109,14 @@ router.get('/item/:collectionName?/:itemName/exists', async (req, res) => {
 	res.send(!!(item))
 })
 
+router.get('/item/:collectionName/random', async (req, res) => {
+  let collectionName = await getPrimaryCollectionName(req.params.collectionName)
+  Test.findRandom({collectionName: collectionName}, {}, {count: 1}, (err, results) => {
+    if (err) console.log(err);
+    else res.send(results);
+  });
+})
+
 /* ======  COLLECTION ROUTES ====== */
 
 // Create a collection
