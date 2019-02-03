@@ -27,7 +27,7 @@ app.get('/', function(req, res) {
 });
 
 let getPrimaryCollectionName = async function(collectionName) {
-	let collection = await itemCollectionModel.findOne({ $or: [ { 'name': collectionName }, { 'aliases': collectionName } ]})
+	let collection = await itemCollectionModel.findOne({ $or: [ { 'name': collectionName }, { 'aliases': { $elemMatch: { value: collectionName }}} ]})
 	if (!collection) collectionName = "default"
 	else collectionName = collection.name
 
@@ -35,7 +35,7 @@ let getPrimaryCollectionName = async function(collectionName) {
 }
 
 let getPrimaryItemName = async function(itemName) {
-	let item = await itemModel.findOne({ $or: [ { name: itemName }, { aliases: itemName } ]})
+	let item = await itemModel.findOne({ $or: [ { name: itemName }, { 'aliases': { $elemMatch: { value: itemName }}} ]})
 	if (!item) itemName = "DNE"
 	else itemName = item.name
 
