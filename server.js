@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const itemModel = require('./models/Item');
 const itemCollectionModel = require('./models/Collection');
 const router = express.Router()
+const cors = require('cors')
 
 // connect to mongoDB database
 const MONGO_URL = "mongodb://localhost/hackathon"
@@ -18,6 +19,7 @@ const app =  express();
 const PORT = process.env.PORT || 7000;
 
 app.use(bodyParser.json());
+app.use(cors);
 app.use(bodyParser.urlencoded({extended: false}));
 
 app.get('/', function(req, res) {
