@@ -95,12 +95,6 @@ router.delete('/item/:collectionName/:itemName', async (req, res) => {
   })
 })
 
-// Get a random item
-router.get('/item/:collectionName/random', async (req, res) => {
-  let collectionName = await getPrimaryCollectionName(req.params.collectionName)
-  res.send("random")
-})
-
 // See if item is in collection
 router.get('/item/:collectionName?/:itemName/exists', async (req, res) => {
 	let collectionName = await getPrimaryCollectionName(req.params.collectionName)
