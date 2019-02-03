@@ -19,7 +19,7 @@ const app =  express();
 const PORT = process.env.PORT || 7000;
 
 app.use(bodyParser.json());
-app.use(cors({ credentials: true, origin: true }))
+app.use(cors({ credentials: false, origin: true }))
 app.use(bodyParser.urlencoded({extended: false}));
 
 app.get('/', function(req, res) {
