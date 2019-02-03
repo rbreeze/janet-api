@@ -77,7 +77,7 @@ router.post('/:collection/item', async (req, res) => {
 
 router.get('/item/:collectionName/random', async (req, res) => {
   let collectionName = await getPrimaryCollectionName(req.params.collectionName)
-  Test.findRandom({collectionName: collectionName}, {}, {count: 1}, (err, results) => {
+  itemModel.findOneRandom({ collectionName: collectionName }, (err, results) => {
     if (err) res.send(err)
     else res.send(results)
   })
