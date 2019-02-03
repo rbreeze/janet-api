@@ -75,6 +75,15 @@ router.post('/:collection/item', async (req, res) => {
 
 });
 
+router.get('/item/:collectionName/random', async (req, res) => {
+  let collectionName = await getPrimaryCollectionName(req.params.collectionName)
+  Test.findRandom({collectionName: collectionName}, {}, {count: 1}, (err, results) => {
+    if (err) res.send(err)
+    else res.send(results)
+  })
+})
+
+
 // Get an item
 router.get('/item/:collectionName?/:itemName', async (req, res) => {
 	let collectionName = await getPrimaryCollectionName(req.params.collectionName)
@@ -103,13 +112,6 @@ router.get('/item/:collectionName?/:itemName/exists', async (req, res) => {
 	res.send(!!(item))
 })
 
-router.get('/item/:collectionName/random', async (req, res) => {
-  let collectionName = await getPrimaryCollectionName(req.params.collectionName)
-  Test.findRandom({collectionName: collectionName}, {}, {count: 1}, (err, results) => {
-    if (err) res.send(err)
-    else res.send(results)
-  })
-})
 
 /* ======  COLLECTION ROUTES ====== */
 
