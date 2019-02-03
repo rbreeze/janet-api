@@ -152,6 +152,7 @@ router.delete('/collection/:name', (req, res) => {
   })
 })
 
+
 /* ======  START THE SERVER ====== */
 
 // prepend /api to routes
